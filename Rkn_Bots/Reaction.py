@@ -1,4 +1,4 @@
-import requests
+import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
@@ -135,109 +135,125 @@ async def start_cmd(bot, message):
         has_spoiler=True, 
         reply_markup=reply_markup)
 
-@Client.on_message(filters.command("start") & filters.group)
-async def group_start_cmd(bot, message):
-    await react_msg(bot, message)
-    user_id = int(message.from_user.id)
-    reply_markup=InlineKeyboardMarkup(group_buttons)
-    await insert(user_id)
-    await message.reply_text(text=script.START_TXT.format(message.from_user.mention),
-        message_effect_id = 5044134455711629726, 
-        reply_markup=reply_markup)
 
 
-#----------------------Fin.py - - - - - - - - - - - - - - - - 
 
-@Client.on_message(filters.command("dice"))
-async def roll_dice(bot, message):
-    await bot.send_dice(message.chat.id, "🎲")
+FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
 
-
-@Client.on_message(filters.command("arrow"))                                      
-async def roll_arrow(bot, message):
-    await bot.send_dice(message.chat.id, "🎯")
-
-@Client.on_message(filters.command("goal"))
-async def roll_goal(bot, message):
-    await bot.send_dice(message.chat.id, "⚽️")
-
-@Client.on_message(filters.command("luck"))
-async def roll_luck(bot, message):
-    await bot.send_dice(message.chat.id, "🎰")
-
-@Client.on_message(filters.command("throw"))
-async def roll_throw(bot, message):
-    await bot.send_dice(message.chat.id, "🏀")
-
-@Client.on_message(filters.command(["bowling", "tenpins"]))
-async def roll_bowling(bot, message):
-    await bot.send_dice(message.chat.id, "🎳")
-
-
-@Client.on_callback_query(filters.regex('help'))
-async def show_help_callback(client, callback_query: CallbackQuery):
-    await callback_query.answer()  # Acknowledge the callback
-    await callback_query.message.edit_text(text=script.HELP_TXT, reply_markup=InlineKeyboardMarkup(back_button))
-
-@Client.on_callback_query(filters.regex('back'))
-async def back_callback(client, callback_query: CallbackQuery):
-    await callback_query.answer()  # Acknowledge the callback
-    await callback_query.message.edit_text(text=script.HOME_TXT, reply_markup=InlineKeyboardMarkup(buttons))
-
-@Client.on_callback_query(filters.regex('about'))
-async def about_callback(client, callback_query: CallbackQuery):
-    await callback_query.answer()# Acknowledge the callback
-    await callback_query.message.edit_text(text=script.ABOUT_TXT, reply_markup=InlineKeyboardMarkup(about_buttons))
-
-@Client.on_message(filters.private & filters.user(Rkn_Bots.ADMIN) & filters.command(["msg"]))
-async def send_message_to_channel(bot, message):
-    # Check if the command is used correctly
-    if len(message.command) < 4:
-        await message.reply_text("**Usage:** /msg <channel_id> <loop_time> <message>")
-        return
-
-    # Extract channel ID, loop time, and message from the command
-    channel_id = message.command[1]
-    loop_time = int(message.command[2])  # Number of times to send the message
-    msg_text = " ".join(message.command[3:])  # The message to send
-
+@Client.on_message(filters.command("fancode"))
+async def fancode_handler(client, message):
     try:
-        # Loop and send the message
-        for i in range(loop_time):
-            await bot.send_message(int(channel_id), msg_text)
-            await asyncio.sleep(1)  # Add a small delay to avoid spamming
-        await message.reply_text(f"Message sent {loop_time} times to channel/group {channel_id}!")
+        async with httpx.AsyncClient() as http:
+            response = await http.get(FANCODE_URL)
+            data = response.json()
+
+        live_matches = [m for m in data.get("matches", []) if m.get("status") == "LIVE"]
+
+        if not live_matches:
+            await message.reply("No live matches right now.")
+            return
+
+        for match in live_matches:
+            text = (f"<a href='{match['src']}'>ㅤ</a>"
+                f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
+                f"🔴 <b>Status:</b> LIVE\n"
+                f"🏟 <b>Event:</b> {match['event_name']}\n"
+                f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n\n"
+                f"<b>Stream info </b>"
+                f"<blockquote>🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>"
+            )
+
+            await message.reply_text(text=text, disable_web_page_preview=False, invert_media=True)
+
     except Exception as e:
-        await message.reply_text(f"Failed to send message to channel/group {channel_id}. Error: {str(e)}")
+        await message.reply("Something went wrong while fetching Fancode data.")
+        print(e)
 
 
 
-@Client.on_message(filters.command("poster") & filters.all)
-async def poster_cmd(client, message: Message):
+
+
+FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
+
+fancode_status = {}  # chat_id: True/False
+fancode_messages = {}  # chat_id: list of msg ids
+
+async def fetch_live_matches():
+    async with httpx.AsyncClient() as http:
+        resp = await http.get(FANCODE_URL)
+        data = resp.json()
+    return [m for m in data.get("matches", []) if m.get("status") == "LIVE"]
+
+async def send_live_matches(client, chat_id):
+    live_matches = await fetch_live_matches()
+    if chat_id in fancode_messages:
+        # delete old messages
+        for msg_id in fancode_messages[chat_id]:
+            try:
+                await client.delete_messages(chat_id, msg_id)
+            except:
+                pass
+
+    sent_msg_ids = []
+    for match in live_matches:
+        text = (f"<a href='{match['src']}'>ㅤ</a>"
+                f" <b>{match['match_name']} ({match['event_name']})</b>\n\n"
+                f"🔴 <b>Status:</b> LIVE\n"
+                f"🏟 <b>Event:</b> {match['event_name']}\n"
+                f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n\n"
+                f"<b>Stream info </b>"
+                f"<blockquote>🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>"
+            )
+        try:
+            sent = await client.send_message(
+                chat_id,
+                text=text,
+                disable_web_page_preview=False, 
+                invert_media = True 
+            )
+            sent_msg_ids.append(sent.id)
+        except Exception as e:
+            print(f"Error sending message: {e}")
+
+    fancode_messages[chat_id] = sent_msg_ids
+
+async def auto_send_loop(client, chat_id):
+    while fancode_status.get(chat_id, False):
+        await send_live_matches(client, chat_id)
+        await asyncio.sleep(1800)  # 30 minutes
+
+@Client.on_message(filters.command("fancode") & filters.group)
+async def fancode_handler(client, message):
     if len(message.command) < 2:
-        return await message.reply("Please provide a movie name.\nUsage: `/poster Animal`", parse_mode="Markdown")
+        return await message.reply("Usage:\n/fancode on\n/fancode off")
 
-    query = " ".join(message.command[1:])
-    api_url = f"http://hgbotz.serv00.net/tmdb/api.php?query={query}"
+    arg = message.command[1].lower()
+    chat_id = message.chat.id
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(api_url) as resp:
-            if resp.status != 200:
-                return await message.reply("Failed to fetch data.")
-            data = await resp.json()
+    if arg == "on":
+        if fancode_status.get(chat_id, False):
+            await message.reply("Fancode auto updates are already ON.")
+            return
+        fancode_status[chat_id] = True
+        await message.reply("Fancode auto updates started. Updates every 30 minutes.")
+        asyncio.create_task(auto_send_loop(client, chat_id))
 
-    poster = data["posters"][0] if data.get("posters") else "N/A"
-    english = "\n".join(data.get("english_backdrops", [])) or "N/A"
-    hindi = "\n".join(data.get("hindi_backdrops", [])) or "N/A"
+    elif arg == "off":
+        if not fancode_status.get(chat_id, False):
+            await message.reply("Fancode auto updates are already OFF.")
+            return
+        fancode_status[chat_id] = False
+        await message.reply("Fancode auto updates stopped.")
+        # delete old messages
+        if chat_id in fancode_messages:
+            for msg_id in fancode_messages[chat_id]:
+                try:
+                    await client.delete_messages(chat_id, msg_id)
+                except:
+                    pass
+            fancode_messages.pop(chat_id)
 
-    text = f"<b>Movie:</b> <code>{query}</code>\n\n"
-    text += f"<b>Poster URL:</b>\n<code>{poster}</code>\n\n"
-    text += f"<b>English Backdrops:</b>\n<code>{english}</code>\n\n"
-    text += f"<b>Hindi Backdrops:</b>\n<code>{hindi}</code>"
-
-    await message.reply(text, disable_web_page_preview=True)
-#--------- react.py-------
-
-@Client.on_message(filters.all)
-async def send_reaction(bot, message):
-    await react_msg(bot, message)
+    else:
+        await message.reply("Unknown option. Use:\n/fancode on\n/fancode off")
