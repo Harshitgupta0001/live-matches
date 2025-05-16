@@ -7,18 +7,18 @@
 import re, time, os
 from os import environ
 
-CRIC_API_KEY = "79261425-9b54-4e25-850c-c13b6e90b101"
+
 
 id_pattern = re.compile(r'^.\d+$')
 
-AUTH_CHANNEL = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('AUTH_CHANNEL', '-1002166149059').split()] # give channel id with seperate space. Ex : ('-10073828 -102782829 -1007282828')
+AUTH_CHANNEL = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('AUTH_CHANNEL', '').split()] # give channel id with seperate space. Ex : ('-10073828 -102782829 -1007282828')
 
 class Rkn_Bots(object):
     
     # Rkn client config  ( required.. 😥)
     API_ID = os.environ.get("API_ID", "25492855")
     API_HASH = os.environ.get("API_HASH", "61876db014de51a4ace6b169608be4f1")
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+    BOT_TOKEN = os.environ.get("BOT_TOKEN", "7376012055:AAGH9MZiFDWVArfToOEADKYQJJ-8SYv1jcg")
 
     # start_pic
     RKN_PIC = os.environ.get("RKN_PIC", "https://i.ibb.co/dMJFrqQ/photo-2024-09-25-11-37-05-7435920937339322372.jpg")
@@ -28,11 +28,11 @@ class Rkn_Bots(object):
     PORT = int(os.environ.get("PORT", "8080"))
 
     # force subs channel ( required.. 😥)
-    FORCE_SUB = os.environ.get("FORCE_SUB", "hgbotz") 
+    FORCE_SUB = os.environ.get("FORCE_SUB", "") 
     
     # database config ( required.. 😥)
-    DB_NAME = os.environ.get("DB_NAME", "HGBOTZ")     
-    DB_URL = os.environ.get("DB_URL", "")
+    DB_NAME = os.environ.get("DB_NAME", "crickeera")     
+    DB_URL = os.environ.get("DB_URL", "mongodb+srv://Yash_607:Yash_607@cluster0.r3s9sbo.mongodb.net/?retryWrites=true&w=majority")
 
     # default caption 
     DEF_CAP = os.environ.get("DEF_CAP", "")
@@ -41,10 +41,5 @@ class Rkn_Bots(object):
     STICKER_ID = os.environ.get("STICKER_ID", "CAACAgIAAxkBAAELFqBllhB70i13m-woXeIWDXU6BD2j7wAC9gcAAkb7rAR7xdjVOS5ziTQE")
 
     # admin id  ( required.. 😥)
-    ADMIN = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '6359874284 7609503336').split()]
+    ADMIN = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '6359874284 ').split()]
     
-
-# Rkn Developer 
-# Don't Remove Credit 😔
-# Telegram Channel @RknDeveloper & @Rkn_Botz
-# Developer @RknDeveloperr
