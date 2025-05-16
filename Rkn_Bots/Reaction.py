@@ -12,13 +12,6 @@ import aiohttp
 buttons = [[
         InlineKeyboardButton('✇ Uᴘᴅᴀᴛᴇs ✇', url="https://t.me/HGBOTZ"),
         InlineKeyboardButton('✨ 𝙲𝙾𝙽𝚃𝙰𝙲𝚃 ✨', url="https://t.me/Harshit_contact_bot")
-    ],[
-        InlineKeyboardButton('〄 Add to me group 〄', url="https://t.me/Reaction_99bot?startgroup=botstart")
-    ],[
-        InlineKeyboardButton('ˣ 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 ˣ', url='https://t.me/Reaction_99bot?startchannel&admin=post_messages+edit_messages+delete_messages'),
-    ],[
-        InlineKeyboardButton('❗️ʜᴇʟᴘ', callback_data='help'), 
-        InlineKeyboardButton('🦋 𝙰𝙱𝙾𝚄𝚃', callback_data='about')
     ]]
 
 group_buttons = [[InlineKeyboardButton('✇ Click To Start Me ✇', url="http://t.me/Reaction_99bot?start=True")
@@ -140,7 +133,7 @@ async def start_cmd(bot, message):
 
 FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
 
-@Client.on_message(filters.command("fancode"))
+@Client.on_message(filters.command("fancode") & filters.private)
 async def fancode_handler(client, message):
     try:
         async with httpx.AsyncClient() as http:
@@ -224,8 +217,8 @@ async def auto_send_loop(client, chat_id):
         await send_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("fancode") & filters.group)
-async def fancode_handler(client, message):
+@Client.on_message(filters.command("fan") & filters.group & filters.user(Rkn_Bots.ADMIN))
+async def fancode(client, message):
     if len(message.command) < 2:
         return await message.reply("Usage:\n/fancode on\n/fancode off")
 
