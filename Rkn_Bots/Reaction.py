@@ -147,17 +147,16 @@ async def fancode_handler(client, message):
             return
 
         for match in live_matches:
-            text = (f"<a href='{match['src']}'>ㅤ</a>"
-                f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
-                f"🔴 <b>Status:</b> LIVE\n"
+            text = (f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
+                f"🔴 <b>FROM:</b> Fancode\n"
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n\n"
-                f"<b>Stream info </b>"
-                f"<blockquote>🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
+                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n\n"
+                f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
 
-            await message.reply_text(text=text, disable_web_page_preview=False, invert_media=True)
+            await message.reply_photo(photo=match['src'], caption=text)
 
     except Exception as e:
         await message.reply("Something went wrong while fetching Fancode data.")
@@ -190,21 +189,19 @@ async def send_live_matches(client, chat_id):
 
     sent_msg_ids = []
     for match in live_matches:
-        text = (f"<a href='{match['src']}'>ㅤ</a>"
-                f" <b>{match['match_name']} ({match['event_name']})</b>\n\n"
-                f"🔴 <b>Status:</b> LIVE\n"
+        text = (f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
+                f"🔴 <b>FROM:</b> Fancode\n"
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n\n"
-                f"<b>Stream info </b>"
-                f"<blockquote>🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
+                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n\n"
+                f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
         try:
-            sent = await client.send_message(
+            sent = await client.send_photo(
                 chat_id,
-                text=text,
-                disable_web_page_preview=False, 
-                invert_media = True 
+                photo=match['src'], 
+                caption = text
             )
             sent_msg_ids.append(sent.id)
         except Exception as e:
