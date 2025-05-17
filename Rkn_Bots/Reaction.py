@@ -406,7 +406,7 @@ SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
 async def sliv(client, message):
     try:
         async with httpx.AsyncClient() as http:
-            response = await http.get("SONYLIV_URL")
+            response = await http.get("https://hgbotz.serv00.net/sliv.php")
             data = response.json()
 
         live_matches = [m for m in data.get("matches", []) if m.get("isLive")]
@@ -445,7 +445,7 @@ sonyliv_messages = {}  # chat_id: list of msg ids
 
 async def fetch_sonyliv_live():
     async with httpx.AsyncClient() as http:
-        resp = await http.get(SONYLIV_URL)
+        resp = await http.get("https://hgbotz.serv00.net/sliv.php")
         data = resp.json()
     return [m for m in data.get("matches", []) if m.get("isLive")]
 
