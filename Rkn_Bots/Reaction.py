@@ -335,16 +335,16 @@ async def send_w_live_matches(client, chat_id):
         # Format decryption keys
         keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
 
-        text = (f" <a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n"
-                f"🏆 <b>Event:</b> {match.get('contentType', 'Cricket Match')}\n"
-                f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                f"👥 <b>Teams:</b> {team1} vs {team2}\n"
-                f"<blockquote expandable><b>Stream URLs:</b>\n{cdn_urls}</blockquote>\n"
-                f"<b>Decryption Keys:</b>\n{keys}\n\n"
-                f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
+        text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n"
+                    f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
+                    f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                    f"👥 <b>Teams:</b> {team1} vs {team2}\n"
+                    f"<blockquote expandable> Stream URLs:</b>\n{cdn_urls}\n</blockquote>"
+                    f"<b>Decryption Keys:</b>\n{keys}\n\n"
+                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
-            sent = await client.send_text(
+            sent = await client.send_message(
                 chat_id,
                 text=text, 
                 disable_web_page_preview = False, 
