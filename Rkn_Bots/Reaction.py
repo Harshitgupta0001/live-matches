@@ -289,7 +289,7 @@ async def willow_handler(client, message):
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
                     f"<b>Stream URLs:</b>\n{cdn_urls}\n\n"
                     f"<b>Decryption Keys:</b>\n{keys}\n\n"
-                    f"<i>Use these URLs in supported players like VLC or MX Player with DRM support</i>")
+                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
             await message.reply_photo(
                 photo=match['cover'],
@@ -340,7 +340,7 @@ async def send_live_matches(client, chat_id):
                 f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
                 f"<b>Stream URLs:</b>\n{cdn_urls}\n\n"
                 f"<b>Decryption Keys:</b>\n{keys}\n\n"
-                f"<i>Use these URLs in supported players like VLC or MX Player</i>")
+                f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
             sent = await client.send_photo(
@@ -359,7 +359,7 @@ async def auto_send_loop(client, chat_id):
         await send_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("will") & filters.user("Rkn_Bots.ADMIN"))
+@Client.on_message(filters.command("willowtv") & filters.user("Rkn_Bots.ADMIN"))
 async def willow_handler(client, message):
     if len(message.command) < 2:
         return await message.reply("Usage:\n/willow on [channel_id]\n/willow off [channel_id]")
@@ -396,3 +396,135 @@ async def willow_handler(client, message):
 
     else:
         await message.reply("Invalid command. Use:\n/willow on [channel_id]\n/willow off [channel_id]")
+
+
+SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
+
+@Client.on_message(filters.command("sonyliv") & filters.private)
+async def sliv_handler(client, message):
+    try:
+        async with httpx.AsyncClient() as http:
+            response = await http.get("https://xybernaut.great-site.net/api/sliv.json")
+            data = response.json()
+
+        live_matches = [m for m in data.get("matches", []) if m.get("isLive")]
+
+        if not live_matches:
+            await message.reply("No live events currently on Sony LIV.")
+            return
+
+        for match in live_matches:
+            # Collect all available servers
+            servers = []
+            for key in match:
+                if key.startswith("Server"):
+                    servers.append(f"🔗 {key}: {match[key]}")
+
+            text = (f"<b>📺 {match['event']}</b>\n\n"
+                    f"🏆 <b>Match:</b> {match['match']}\n"
+                    f"📡 <b>Channel:</b> {match.get('TVchannel', 'N/A')}\n"
+                    f"🎬 <b>Genre:</b> {match.get('genre', 'Sports')}\n"
+                    f"🖥 <b>Quality:</b> {match.get('MaxResolution', 'HD')}\n\n"
+                    f"<b>Available Streams:</b>\n" + "\n".join(servers) + "\n\n"
+                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
+
+            await message.reply_photo(
+                photo=match['poster'],
+                caption=text
+            )
+
+    except Exception as e:
+        await message.reply("Failed to fetch Sony LIV data. Please try again later.")
+        print(f"Sony LIV error: {e}")
+
+SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
+sonyliv_status = {}  # chat_id: True/False
+sonyliv_messages = {}  # chat_id: list of msg ids
+
+async def fetch_sonyliv_live():
+    async with httpx.AsyncClient() as http:
+        resp = await http.get(SONYLIV_URL)
+        data = resp.json()
+    return [m for m in data.get("matches", []) if m.get("isLive")]
+
+async def send_sonyliv_updates(client, chat_id):
+    live_events = await fetch_sonyliv_live()
+    
+    # Delete old messages
+    if chat_id in sonyliv_messages:
+        for msg_id in sonyliv_messages[chat_id]:
+            try:
+                await client.delete_messages(chat_id, msg_id)
+            except:
+                pass
+
+    sent_msg_ids = []
+    for event in live_events:
+        # Collect all server links
+        servers = []
+        for key in event:
+            if key.startswith("Server"):
+                servers.append(f"🌐 {key}: {event[key]}")
+        
+        text = (f"<b>🔴 LIVE: {event['event']}</b>\n\n"
+                f"🏆 <b>Match:</b> {event['match']}\n"
+                f"📡 <b>Channel:</b> {event.get('TVchannel', 'Sony LIV')}\n"
+                f"🎬 <b>Genre:</b> {event.get('genre', 'Sports')}\n"
+                f"🖥 <b>Quality:</b> {event.get('MaxResolution', 'HD')}\n\n"
+                f"<b>Stream Links:</b>\n" + "\n".join(servers) + "\n\n"
+                f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
+
+        try:
+            sent = await client.send_photo(
+                chat_id,
+                photo=event['poster'],
+                caption=text
+            )
+            sent_msg_ids.append(sent.id)
+        except Exception as e:
+            print(f"Sony LIV send error: {e}")
+
+    sonyliv_messages[chat_id] = sent_msg_ids
+
+async def sonyliv_auto_loop(client, chat_id):
+    while sonyliv_status.get(chat_id, False):
+        await send_sonyliv_updates(client, chat_id)
+        await asyncio.sleep(1800)  # 30 minutes
+
+@Client.on_message(filters.command("sliv")  & filters.user(Rkn_Bots.ADMIN))
+async def sonyliv_handler(client, message):
+    if len(message.command) < 2:
+        return await message.reply("Usage:\n/sonyliv on [channel_id]\n/sonyliv off [channel_id]")
+
+    arg = message.command[1].lower()
+    
+    # Handle channel ID parameter
+    if len(message.command) > 2 and message.command[2].lstrip('-').isdigit():
+        chat_id = int(message.command[2])
+    else:
+        chat_id = message.chat.id
+
+    if arg == "on":
+        if sonyliv_status.get(chat_id, False):
+            await message.reply(f"Sony LIV updates already active for {'this chat' if chat_id == message.chat.id else 'channel'}")
+            return
+        sonyliv_status[chat_id] = True
+        await message.reply(f"🎬 Sony LIV LIVE updates activated for {'this chat' if chat_id == message.chat.id else 'channel'}!\nUpdates every 30 minutes")
+        asyncio.create_task(sonyliv_auto_loop(client, chat_id))
+
+    elif arg == "off":
+        if not sonyliv_status.get(chat_id, False):
+            await message.reply(f"Sony LIV updates already inactive for {'this chat' if chat_id == message.chat.id else 'channel'}")
+            return
+        sonyliv_status[chat_id] = False
+        await message.reply(f"⏹ Sony LIV updates stopped for {'this chat' if chat_id == message.chat.id else 'channel'}")
+        if chat_id in sonyliv_messages:
+            for msg_id in sonyliv_messages[chat_id]:
+                try:
+                    await client.delete_messages(chat_id, msg_id)
+                except:
+                    pass
+            sonyliv_messages.pop(chat_id)
+
+    else:
+        await message.reply("Invalid command. Use:\n/sonyliv on [channel_id]\n/sonyliv off [channel_id]")
