@@ -255,149 +255,6 @@ async def fancode(client, message):
 
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
-
-@Client.on_message(filters.command("willow") & filters.private)
-async def willow(client, message):
-    try:
-        async with httpx.AsyncClient() as http:
-            response = await http.get(WILLOW_URL)
-            data = response.json()
-
-        live_matches = [m for m in data.get("matches", []) if m.get("status", "").lower() == "live"]
-
-        if not live_matches:
-            await message.reply("No live matches currently on Willow TV.")
-            return
-
-        for match in live_matches:
-            # Extract teams from title
-            teams = match['title'].split('vs')
-            team1 = teams[0].split('-')[-1].strip() if len(teams) > 0 else "Team 1"
-            team2 = teams[1].split('-')[0].strip() if len(teams) > 1 else "Team 2"
-          
-            # Format CDN URLs
-            cdn_urls = "\n".join([f"🌐 {url['cdn']}: {url['url']}" 
-                                for url in match.get('playback_data', {}).get('urls', [])])
-        
-            # Format decryption keys
-            keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
-
-            text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n"
-                        f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
-                        f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                        f"👥 <b>Teams:</b> {team1} vs {team2}\n"
-                        f"<blockquote expandable> Stream URLs:</b>\n{cdn_urls}\n</blockquote>"
-                        f"<b>Decryption Keys:</b>\n{keys}\n\n"
-                        f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
-
-            await message.reply_text(
-                text=text, 
-                disable_web_page_preview=False, 
-                invert_media=True
-            )
-
-    except Exception as e:
-        await message.reply(f"Failed to fetch Willow TV data. Please try again later. {e} ")
-        print(f"Willow TV error: {e}")
-
-
-WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
-willow_status = {}  # chat_id: True/False
-willow_messages = {}  # chat_id: list of msg ids
-
-async def fetch_w_live_matches():
-    async with httpx.AsyncClient() as http:
-        resp = await http.get(WILLOW_URL)
-        data = resp.json()
-    return [m for m in data.get("matches", []) if m.get("status", "").lower() == "live"]
-
-async def send_w_live_matches(client, chat_id):
-    live_matches = await fetch_w_live_matches()
-    if chat_id in willow_messages:
-        for msg_id in willow_messages[chat_id]:
-            try:
-                await client.delete_messages(chat_id, msg_id)
-            except:
-                pass
-
-    sent_msg_ids = []
-    for match in live_matches:
-        # Extract teams from title
-        teams = match['title'].split('vs')
-        team1 = teams[0].split('-')[-1].strip() if len(teams) > 0 else "Team 1"
-        team2 = teams[1].split('-')[0].strip() if len(teams) > 1 else "Team 2"
-        
-        # Format CDN URLs
-        cdn_urls = "\n".join([f"🌐 {url['cdn']}: {url['url']}" 
-                            for url in match.get('playback_data', {}).get('urls', [])])
-        
-        # Format decryption keys
-        keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
-
-        text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n"
-                    f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
-                    f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                    f"👥 <b>Teams:</b> {team1} vs {team2}\n"
-                    f"<blockquote expandable> Stream URLs:</b>\n{cdn_urls}\n</blockquote>"
-                    f"<b>Decryption Keys:</b>\n{keys}\n\n"
-                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
-
-        try:
-            sent = await client.send_message(
-                chat_id,
-                text=text, 
-                disable_web_page_preview = False, 
-                invert_media = True 
-            )
-            sent_msg_ids.append(sent.id)
-        except Exception as e:
-            print(f"Error sending message: {e}")
-
-    willow_messages[chat_id] = sent_msg_ids
-
-async def auto_send_w_loop(client, chat_id):
-    while willow_status.get(chat_id, False):
-        await send_w_live_matches(client, chat_id)
-        await asyncio.sleep(1800)  # 30 minutes
-
-@Client.on_message(filters.command("wtv") & filters.user(Rkn_Bots.ADMIN))
-async def wtv_handler(client, message):
-    if len(message.command) < 2:
-        return await message.reply("Usage:\n/willow on [channel_id]\n/willow off [channel_id]")
-
-    arg = message.command[1].lower()
-    
-    # Handle channel ID parameter
-    if len(message.command) > 2 and message.command[2].lstrip('-').isdigit():
-        chat_id = int(message.command[2])
-    else:
-        chat_id = message.chat.id
-
-    if arg == "on":
-        if willow_status.get(chat_id, False):
-            await message.reply(f"Willow updates already active for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
-            return
-        willow_status[chat_id] = True
-        await message.reply(f"🚦 Willow live updates activated for {'this chat' if chat_id == message.chat.id else 'specified channel'}!\nUpdates every 30 minutes")
-        asyncio.create_task(auto_send_w_loop(client, chat_id))
-
-    elif arg == "off":
-        if not willow_status.get(chat_id, False):
-            await message.reply(f"Willow updates already inactive for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
-            return
-        willow_status[chat_id] = False
-        await message.reply(f"🚫 Willow updates stopped for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
-        if chat_id in willow_messages:
-            for msg_id in willow_messages[chat_id]:
-                try:
-                    await client.delete_messages(chat_id, msg_id)
-                except:
-                    pass
-            willow_messages.pop(chat_id)
-
-    else:
-        await message.reply("Invalid command. Use:\n/willow on [channel_id]\n/willow off [channel_id]")
 
 
 SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
@@ -530,3 +387,55 @@ async def sonyliv_handler(client, message):
 
     else:
         await message.reply("Invalid command. Use:\n/sonyliv on [channel_id]\n/sonyliv off [channel_id]")
+
+
+
+
+@Client.on_message(filters.command("willow") & filters.private)
+async def willow_handler(client, message):
+    try:
+        async with httpx.AsyncClient() as http:
+            response = await http.get("https://hgbotz.serv00.net/willow.php")
+            data = response.json()
+
+        live_matches = [m for m in data.get("matches", []) if m.get("status", "").lower() == "live"]
+
+        if not live_matches:
+            await message.reply("No live matches currently on Willow TV.")
+            return
+
+        for match in live_matches:
+            # Extract teams from title
+            teams = match['title'].split('vs')
+            team1 = teams[0].split('-')[-1].strip() if len(teams) > 0 else "Team 1"
+            team2 = teams[1].split('-')[0].strip() if len(teams) > 1 else "Team 2"
+            
+            # Format DRM URLs with keys
+            drm_streams = []
+            playback_data = match.get('playback_data', {})
+            
+            for url in playback_data.get('urls', []):
+                for key in playback_data.get('keys', []):
+                    drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
+                    drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
+
+            text = (f"<b>{match['title']}</b>\n\n"
+                    f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
+                    f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                    f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
+                    f"<b>DRM Stream URLs:</b>\n" + "\n".join(drm_streams) + "\n\n"
+                    f"<i>Use in players supporting ClearKey DRM (ExoPlayer, Shaka Player)</i>")
+
+            await message.reply_photo(
+                photo=match['cover'],
+                caption=text,
+                parse_mode="HTML"
+            )
+
+    except httpx.HTTPError:
+        await message.reply("⚠️ Couldn't connect to Willow TV servers. Try again later.")
+    except json.JSONDecodeError:
+        await message.reply("⚠️ Invalid data received from Willow TV.")
+    except Exception as e:
+        await message.reply("❌ Error fetching match data.")
+        print(f"Willow TV error: {e}")
