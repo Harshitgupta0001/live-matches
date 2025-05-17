@@ -406,7 +406,7 @@ SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
 async def sliv(client, message):
     try:
         async with httpx.AsyncClient() as http:
-            response = await http.get("https://xybernaut.great-site.net/api/sliv.json")
+            response = await http.get("SONYLIV_URL")
             data = response.json()
 
         live_matches = [m for m in data.get("matches", []) if m.get("isLive")]
