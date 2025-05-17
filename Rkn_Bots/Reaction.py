@@ -255,7 +255,7 @@ async def fancode(client, message):
 
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.json"
+WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow(client, message):
