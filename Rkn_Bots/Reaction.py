@@ -171,14 +171,14 @@ FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/mai
 fancode_status = {}  # chat_id: True/False
 fancode_messages = {}  # chat_id: list of msg ids
 
-async def fetch_live_matches():
+async def fetch_f_live_matches():
     async with httpx.AsyncClient() as http:
         resp = await http.get(FANCODE_URL)
         data = resp.json()
     return [m for m in data.get("matches", []) if m.get("status") == "LIVE"]
 
-async def send_live_matches(client, chat_id):
-    live_matches = await fetch_live_matches()
+async def send_f_live_matches(client, chat_id):
+    live_matches = await fetch_f_live_matches()
     if chat_id in fancode_messages:
         # delete old messages
         for msg_id in fancode_messages[chat_id]:
@@ -209,9 +209,9 @@ async def send_live_matches(client, chat_id):
 
     fancode_messages[chat_id] = sent_msg_ids
 
-async def auto_send_loop(client, chat_id):
+async def auto_send_f_loop(client, chat_id):
     while fancode_status.get(chat_id, False):
-        await send_live_matches(client, chat_id)
+        await send_f_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
 @Client.on_message(filters.command("fan") & filters.user(Rkn_Bots.ADMIN))
@@ -233,7 +233,7 @@ async def fancode(client, message):
             return
         fancode_status[chat_id] = True
         await message.reply(f"Fancode auto updates started for {'this chat' if chat_id == message.chat.id else 'the specified channel'}. Updates every 30 minutes.")
-        asyncio.create_task(auto_send_loop(client, chat_id))
+        asyncio.create_task(auto_send_f_loop(client, chat_id))
 
     elif arg == "off":
         if not fancode_status.get(chat_id, False):
@@ -258,7 +258,7 @@ async def fancode(client, message):
 WILLOW_URL = "https://xybernaut.great-site.net/api/willow.json"
 
 @Client.on_message(filters.command("willow") & filters.private)
-async def willow_handler(client, message):
+async def willow(client, message):
     try:
         async with httpx.AsyncClient() as http:
             response = await http.get(WILLOW_URL)
@@ -305,14 +305,14 @@ WILLOW_URL = "https://xybernaut.great-site.net/api/willow.json"
 willow_status = {}  # chat_id: True/False
 willow_messages = {}  # chat_id: list of msg ids
 
-async def fetch_live_matches():
+async def fetch_w_live_matches():
     async with httpx.AsyncClient() as http:
         resp = await http.get(WILLOW_URL)
         data = resp.json()
     return [m for m in data.get("matches", []) if m.get("status", "").lower() == "live"]
 
-async def send_live_matches(client, chat_id):
-    live_matches = await fetch_live_matches()
+async def send_w_live_matches(client, chat_id):
+    live_matches = await fetch_w_live_matches()
     if chat_id in willow_messages:
         for msg_id in willow_messages[chat_id]:
             try:
@@ -354,9 +354,9 @@ async def send_live_matches(client, chat_id):
 
     willow_messages[chat_id] = sent_msg_ids
 
-async def auto_send_loop(client, chat_id):
+async def auto_send_w_loop(client, chat_id):
     while willow_status.get(chat_id, False):
-        await send_live_matches(client, chat_id)
+        await send_w_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
 @Client.on_message(filters.command("willowtv") & filters.user("Rkn_Bots.ADMIN"))
@@ -378,7 +378,7 @@ async def willow_handler(client, message):
             return
         willow_status[chat_id] = True
         await message.reply(f"🚦 Willow live updates activated for {'this chat' if chat_id == message.chat.id else 'specified channel'}!\nUpdates every 30 minutes")
-        asyncio.create_task(auto_send_loop(client, chat_id))
+        asyncio.create_task(auto_send_w_loop(client, chat_id))
 
     elif arg == "off":
         if not willow_status.get(chat_id, False):
@@ -401,7 +401,7 @@ async def willow_handler(client, message):
 SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
 
 @Client.on_message(filters.command("sonyliv") & filters.private)
-async def sliv_handler(client, message):
+async def sliv(client, message):
     try:
         async with httpx.AsyncClient() as http:
             response = await http.get("https://xybernaut.great-site.net/api/sliv.json")
@@ -434,7 +434,7 @@ async def sliv_handler(client, message):
             )
 
     except Exception as e:
-        await message.reply("Failed to fetch Sony LIV data. Please try again later.")
+        await message.reply(f"Fail to Fatch {e}")
         print(f"Sony LIV error: {e}")
 
 SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
