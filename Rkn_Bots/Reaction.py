@@ -275,21 +275,21 @@ async def willow(client, message):
             teams = match['title'].split('vs')
             team1 = teams[0].split('-')[-1].strip() if len(teams) > 0 else "Team 1"
             team2 = teams[1].split('-')[0].strip() if len(teams) > 1 else "Team 2"
-            
-           # Format CDN URLs with embedded keys
-            urls = match.get('playback_data', {}).get('urls', [])
-            keys = match.get('playback_data', {}).get('keys', [])
-    
-            cdn_urls = "\n".join([
-                f"🌐 {urls[i]['cdn']}: {urls[i]['url']}?|drmScheme=clearkey&drmLicense={keys[i]}"
-                for i in range(min(len(urls), len(keys)))
-            ]) 
+          
+            # Format CDN URLs
+            cdn_urls = "\n".join([f"🌐 {url['cdn']}: {url['url']}" 
+                                for url in match.get('playback_data', {}).get('urls', [])])
+        
+            # Format decryption keys
+            keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
+
             text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n"
-                    f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
-                    f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                    f"👥 <b>Teams:</b> {team1} vs {team2}\n"
-                    f"<blockquote expandable> Stream URLs:</b>\n{cdn_urls}</blockquote>\n"
-                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
+                        f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
+                        f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                        f"👥 <b>Teams:</b> {team1} vs {team2}\n"
+                        f"<blockquote expandable> Stream URLs:</b>\n{cdn_urls}\n</blockquote>"
+                        f"<b>Decryption Keys:</b>\n{keys}\n\n"
+                        f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
             await message.reply_text(
                 text=text, 
