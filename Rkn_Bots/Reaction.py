@@ -255,7 +255,7 @@ async def fancode(client, message):
 
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.json"
+WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow(client, message):
@@ -302,7 +302,7 @@ async def willow(client, message):
         print(f"Willow TV error: {e}")
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.json"
+WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
 willow_status = {}  # chat_id: True/False
 willow_messages = {}  # chat_id: list of msg ids
 
@@ -400,7 +400,7 @@ async def wtv_handler(client, message):
         await message.reply("Invalid command. Use:\n/willow on [channel_id]\n/willow off [channel_id]")
 
 
-SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
 
 @Client.on_message(filters.command("sonyliv") & filters.private)
 async def sliv(client, message):
@@ -439,7 +439,7 @@ async def sliv(client, message):
         await message.reply(f"Fail to Fatch {e}")
         print(f"Sony LIV error: {e}")
 
-SONYLIV_URL = "https://xybernaut.great-site.net/api/sliv.json"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
 sonyliv_status = {}  # chat_id: True/False
 sonyliv_messages = {}  # chat_id: list of msg ids
 
