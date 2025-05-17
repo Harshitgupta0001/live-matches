@@ -492,7 +492,7 @@ async def send_w_live_matches(client, chat_id):
                 chat_id,
                 text=text, 
                 disable_web_page_preview =False, 
-                Invert_media =True 
+                invert_media =True 
             )
             sent_msg_ids.append(sent.id)
         except Exception as e:
