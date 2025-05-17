@@ -201,7 +201,7 @@ async def send_live_matches(client, chat_id):
             sent = await client.send_photo(
                 chat_id,
                 photo=match['src'], 
-                caption = text
+                caption=text
             )
             sent_msg_ids.append(sent.id)
         except Exception as e:
@@ -214,28 +214,33 @@ async def auto_send_loop(client, chat_id):
         await send_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("fan") & filters.group & filters.user(Rkn_Bots.ADMIN))
+@Client.on_message(filters.command("fan") & filters.user(Rkn_Bots.ADMIN))
 async def fancode(client, message):
     if len(message.command) < 2:
-        return await message.reply("Usage:\n/fancode on\n/fancode off")
+        return await message.reply("Usage:\n/fan on [channel_id]\n/fan off [channel_id]")
 
     arg = message.command[1].lower()
-    chat_id = message.chat.id
+    
+    # Check if channel ID is provided
+    if len(message.command) > 2 and message.command[2].lstrip('-').isdigit():
+        chat_id = int(message.command[2])
+    else:
+        chat_id = message.chat.id
 
     if arg == "on":
         if fancode_status.get(chat_id, False):
-            await message.reply("Fancode auto updates are already ON.")
+            await message.reply(f"Fancode auto updates are already ON for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
             return
         fancode_status[chat_id] = True
-        await message.reply("Fancode auto updates started. Updates every 30 minutes.")
+        await message.reply(f"Fancode auto updates started for {'this chat' if chat_id == message.chat.id else 'the specified channel'}. Updates every 30 minutes.")
         asyncio.create_task(auto_send_loop(client, chat_id))
 
     elif arg == "off":
         if not fancode_status.get(chat_id, False):
-            await message.reply("Fancode auto updates are already OFF.")
+            await message.reply(f"Fancode auto updates are already OFF for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
             return
         fancode_status[chat_id] = False
-        await message.reply("Fancode auto updates stopped.")
+        await message.reply(f"Fancode auto updates stopped for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
         # delete old messages
         if chat_id in fancode_messages:
             for msg_id in fancode_messages[chat_id]:
@@ -246,4 +251,4 @@ async def fancode(client, message):
             fancode_messages.pop(chat_id)
 
     else:
-        await message.reply("Unknown option. Use:\n/fancode on\n/fancode off")
+        await message.reply("Unknown option. Use:\n/fan on [channel_id]\n/fan off [channel_id]")
