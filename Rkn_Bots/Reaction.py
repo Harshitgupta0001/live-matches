@@ -255,7 +255,7 @@ async def fancode(client, message):
 
 
 
-WILLOW_URL = "https://xybernaut.great-site.net/api/willow.json"
+WILLOW_URL = "https://xybernaut.great-site.net/api/willow_response.json"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow(client, message):
@@ -297,11 +297,11 @@ async def willow(client, message):
             )
 
     except Exception as e:
-        await message.reply("Failed to fetch Willow TV data. Please try again later.")
+        await message.reply(f"Failed to fetch Willow TV data. Please try again later. {e} ")
         print(f"Willow TV error: {e}")
 
 
-WILLOW_URL = "https://xybernaut.great-site.net/api/willow.json"
+WILLOW_URL = "https://xybernaut.great-site.net/api/willow_response.json"
 willow_status = {}  # chat_id: True/False
 willow_messages = {}  # chat_id: list of msg ids
 
@@ -359,8 +359,8 @@ async def auto_send_w_loop(client, chat_id):
         await send_w_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("willowtv") & filters.user("Rkn_Bots.ADMIN"))
-async def willow_handler(client, message):
+@Client.on_message(filters.command("will") & filters.user("Rkn_Bots.ADMIN"))
+async def willowtv_handler(client, message):
     if len(message.command) < 2:
         return await message.reply("Usage:\n/willow on [channel_id]\n/willow off [channel_id]")
 
