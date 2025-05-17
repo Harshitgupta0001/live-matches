@@ -152,7 +152,7 @@ async def fancode_handler(client, message):
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
-                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n\n"
+                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
 
@@ -194,7 +194,7 @@ async def send_f_live_matches(client, chat_id):
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
-                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n\n"
+                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
         try:
@@ -257,13 +257,13 @@ async def fancode(client, message):
 
 
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
 
 @Client.on_message(filters.command("sonyliv") & filters.private)
 async def sliv(client, message):
     try:
         async with httpx.AsyncClient() as http:
-            response = await http.get("https://hgbotz.serv00.net/sliv.php")
+            response = await http.get(SONYLIV_URL)
             data = response.json()
 
         live_matches = [m for m in data.get("matches", []) if m.get("isLive")]
@@ -283,8 +283,8 @@ async def sliv(client, message):
                     f"🏆 <b>Match:</b> {match['match']}\n"
                     f"📡 <b>Channel:</b> {match.get('TVchannel', 'N/A')}\n"
                     f"🎬 <b>Genre:</b> {match.get('genre', 'Sports')}\n"
-                    f"🖥 <b>Quality:</b> {match.get('MaxResolution', 'HD')}\n\n"
-                    f"<b>Available Streams:</b>\n" + "\n".join(servers) + "\n\n"
+                    f"🖥 <b>Quality:</b> {match.get('MaxResolution', 'HD')}\n"
+                    f"<blockquote expandable><b>Available Streams:</b>\n" + "\n".join(servers) + "\n\n</blockquote>"
                     f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
             await message.reply_photo(
@@ -296,13 +296,13 @@ async def sliv(client, message):
         await message.reply(f"Fail to Fatch {e}")
         print(f"Sony LIV error: {e}")
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
 sonyliv_status = {}  # chat_id: True/False
 sonyliv_messages = {}  # chat_id: list of msg ids
 
 async def fetch_sonyliv_live():
     async with httpx.AsyncClient() as http:
-        resp = await http.get("https://hgbotz.serv00.net/sliv.php")
+        resp = await http.get(SONYLIV_URL)
         data = resp.json()
     return [m for m in data.get("matches", []) if m.get("isLive")]
 
@@ -329,8 +329,8 @@ async def send_sonyliv_updates(client, chat_id):
                 f"🏆 <b>Match:</b> {event['match']}\n"
                 f"📡 <b>Channel:</b> {event.get('TVchannel', 'Sony LIV')}\n"
                 f"🎬 <b>Genre:</b> {event.get('genre', 'Sports')}\n"
-                f"🖥 <b>Quality:</b> {event.get('MaxResolution', 'HD')}\n\n"
-                f"<b>Stream Links:</b>\n" + "\n".join(servers) + "\n\n"
+                f"🖥 <b>Quality:</b> {event.get('MaxResolution', 'HD')}\n"
+                f"<blockquote expandable ><b>Stream Links:</b>\n" + "\n".join(servers) + "\n\n</blockquote>"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
@@ -390,15 +390,16 @@ async def sonyliv_handler(client, message):
 
 
 
+WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow_handler(client, message):
     try:
         async with httpx.AsyncClient() as http:
-            response = await http.get("https://hgbotz.serv00.net/willow.php")
+            response = await http.get(WILLOW_URL)
             data = response.json()
 
-        live_matches = [m for m in data.get("matches", []) if m.get("status", "").lower() == "live"]
+        live_matches = data.get("matches", []) 
 
         if not live_matches:
             await message.reply("No live matches currently on Willow TV.")
