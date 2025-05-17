@@ -283,8 +283,7 @@ async def willow(client, message):
             # Format decryption keys
             keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
 
-            text = (f"<a href='match['cover']'>ㅤ</a>"
-                    f"<b>{match['title']}</b>\n\n"
+            text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
@@ -336,7 +335,7 @@ async def send_w_live_matches(client, chat_id):
         # Format decryption keys
         keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
 
-        text = (f"<b>{match['title']}</b>\n\n"
+        text = (f" <a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n\n"
                 f"🏆 <b>Event:</b> {match.get('contentType', 'Cricket Match')}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
@@ -345,10 +344,11 @@ async def send_w_live_matches(client, chat_id):
                 f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
-            sent = await client.send_photo(
+            sent = await client.send_text(
                 chat_id,
-                photo=match['cover'],
-                caption=text
+                text=text, 
+                disable_web_page_preview = False, 
+                invert_media = True 
             )
             sent_msg_ids.append(sent.id)
         except Exception as e:
