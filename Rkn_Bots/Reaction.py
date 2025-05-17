@@ -361,8 +361,8 @@ async def auto_send_w_loop(client, chat_id):
         await send_w_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("will") & filters.user("Rkn_Bots.ADMIN"))
-async def willow_tv_handler(client, message):
+@Client.on_message(filters.command("wtv") & filters.user("Rkn_Bots.ADMIN"))
+async def wtv_handler(client, message):
     if len(message.command) < 2:
         return await message.reply("Usage:\n/willow on [channel_id]\n/willow off [channel_id]")
 
