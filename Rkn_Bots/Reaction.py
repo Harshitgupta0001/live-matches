@@ -283,7 +283,8 @@ async def willow(client, message):
             # Format decryption keys
             keys = "\n".join([f"🔑 {key}" for key in match.get('playback_data', {}).get('keys', [])])
 
-            text = (f"<b>{match['title']}</b>\n\n"
+            text = (f"<a href='match['cover']'>ㅤ</a>"
+                    f"<b>{match['title']}</b>\n\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
@@ -291,9 +292,10 @@ async def willow(client, message):
                     f"<b>Decryption Keys:</b>\n{keys}\n\n"
                     f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
-            await message.reply_photo(
-                photo=match['cover'],
-                caption=text
+            await message.reply_text(
+                text=text, 
+                disable_web_page_preview=False, 
+                invert_media=True
             )
 
     except Exception as e:
