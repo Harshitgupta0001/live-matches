@@ -255,7 +255,7 @@ async def fancode(client, message):
 
 
 
-WILLOW_URL = "https://xybernaut.great-site.net/api/willow_response.json"
+WILLOW_URL = "https://hgbotz.serv00.net/willow.json"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow(client, message):
@@ -301,7 +301,7 @@ async def willow(client, message):
         print(f"Willow TV error: {e}")
 
 
-WILLOW_URL = "https://xybernaut.great-site.net/api/willow_response.json"
+WILLOW_URL = "https://hgbotz.serv00.net/willow.json"
 willow_status = {}  # chat_id: True/False
 willow_messages = {}  # chat_id: list of msg ids
 
