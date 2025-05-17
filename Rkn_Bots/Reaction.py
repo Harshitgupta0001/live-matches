@@ -400,7 +400,7 @@ async def wtv_handler(client, message):
         await message.reply("Invalid command. Use:\n/willow on [channel_id]\n/willow off [channel_id]")
 
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
 
 @Client.on_message(filters.command("sonyliv") & filters.private)
 async def sliv(client, message):
@@ -439,7 +439,7 @@ async def sliv(client, message):
         await message.reply(f"Fail to Fatch {e}")
         print(f"Sony LIV error: {e}")
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
+SONYLIV_URL = "https://hgbotz.serv00.net/sliv.json"
 sonyliv_status = {}  # chat_id: True/False
 sonyliv_messages = {}  # chat_id: list of msg ids
 
