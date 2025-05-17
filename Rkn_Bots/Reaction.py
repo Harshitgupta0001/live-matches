@@ -419,17 +419,18 @@ async def willow_handler(client, message):
                     drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
                     drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
-            text = (f"<b>{match['title']}</b>\n\n"
+            text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                    f"👥 <b>Teams:</b> {team1} vs {team2}\n\n"
-                    f"<b>DRM Stream URLs:</b>\n" + "\n".join(drm_streams) + "\n\n"
-                    f"<i>Use in players supporting ClearKey DRM (ExoPlayer, Shaka Player)</i>")
+                    f"👥 <b>Teams:</b> {team1} vs {team2}\n"
+                    f"<blockquote expandable><b>DRM Stream URLs:</b>\n" + "\n".join(drm_streams) + "\n\n</blockquote>"
+                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
-            await message.reply_photo(
-                photo=match['cover'],
-                caption=text,
-                parse_mode="HTML"
+            await message.reply_text(
+                
+                text=text,
+                disable_web_page_preview =False, 
+                invert_media =True 
             )
 
     except httpx.HTTPError:
