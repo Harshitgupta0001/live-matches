@@ -2,7 +2,7 @@ import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
-from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages, get_active_fancode_chats, get_sonyliv_status, set_sonyliv_status, get_sonyliv_messages, set_sonyliv_messages, delete_sonyliv_messages, get_active_sonyliv_chats
+from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages, get_active_fancode_chats, get_sonyliv_status, set_sonyliv_status, get_sonyliv_messages, set_sonyliv_messages, delete_sonyliv_messages, get_active_sonyliv_chats, get_active_willow_chats, delete_willow_messages, set_willow_messages, get_willow_messages, set_willow_status, get_willow_status
 from pyrogram.errors import *
 from pyrogram.types import *
 from utils import react_msg 
@@ -461,24 +461,26 @@ async def willow_handler(client, message):
 
 
 
+
+
 WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
-willow_status = {}  # chat_id: True/False
-willow_messages = {}  # chat_id: list of msg ids
 
 async def fetch_w_live_matches():
     async with httpx.AsyncClient() as http:
         resp = await http.get(WILLOW_URL)
         data = resp.json()
-    return data.get("matches", []) 
+    return data.get("matches", [])
 
 async def send_w_live_matches(client, chat_id):
     live_matches = await fetch_w_live_matches()
-    if chat_id in willow_messages:
-        for msg_id in willow_messages[chat_id]:
-            try:
-                await client.delete_messages(chat_id, msg_id)
-            except:
-                pass
+    old_msg_ids = await get_willow_messages(chat_id)
+    
+    # Delete old messages
+    for msg_id in old_msg_ids:
+        try:
+            await client.delete_messages(chat_id, msg_id)
+        except:
+            pass
 
     sent_msg_ids = []
     for match in live_matches:
@@ -497,29 +499,35 @@ async def send_w_live_matches(client, chat_id):
                 drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
         text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
-                    f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
-                    f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                    f"👥 <b>Teams:</b> {team1} vs {team2}\n"
-                    f"<blockquote expandable><b>DRM Stream URLs:</b>\n" + "\n".join(drm_streams) + "\n\n</blockquote>"
-                    f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
+                f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
+                f"🕒 <b>Start Time:</b> {match['startTime']}\n"
+                f"👥 <b>Teams:</b> {team1} vs {team2}\n"
+                f"<blockquote expandable><b>DRM Stream URLs:</b>\n" + "\n".join(drm_streams) + "\n\n</blockquote>"
+                f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
             sent = await client.send_message(
                 chat_id,
                 text=text, 
-                disable_web_page_preview =False, 
-                invert_media =True 
+                disable_web_page_preview=False, 
+                invert_media=True
             )
             sent_msg_ids.append(sent.id)
         except Exception as e:
-            print(f"Error sending message: {e}")
+            print(f"Willow TV send error: {e}")
 
-    willow_messages[chat_id] = sent_msg_ids
+    await set_willow_messages(chat_id, sent_msg_ids)
 
 async def auto_send_w_loop(client, chat_id):
-    while willow_status.get(chat_id, False):
+    while await get_willow_status(chat_id):
         await send_w_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
+
+async def init_willow_loops(client):
+    active_chats = await get_active_willow_chats()
+    for chat_id in active_chats:
+        asyncio.create_task(auto_send_w_loop(client, chat_id))
+        print(f"♻️ Restarted Willow TV updates for chat {chat_id}")
 
 @Client.on_message(filters.command("willowtv") & filters.user(Rkn_Bots.ADMIN))
 async def willow_tv_handler(client, message):
@@ -535,26 +543,30 @@ async def willow_tv_handler(client, message):
         chat_id = message.chat.id
 
     if arg == "on":
-        if willow_status.get(chat_id, False):
+        current_status = await get_willow_status(chat_id)
+        if current_status:
             await message.reply(f"Willow updates already active for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
             return
-        willow_status[chat_id] = True
+        await set_willow_status(chat_id, True)
         await message.reply(f"🚦 Willow live updates activated for {'this chat' if chat_id == message.chat.id else 'specified channel'}!\nUpdates every 30 minutes")
         asyncio.create_task(auto_send_w_loop(client, chat_id))
 
     elif arg == "off":
-        if not willow_status.get(chat_id, False):
+        current_status = await get_willow_status(chat_id)
+        if not current_status:
             await message.reply(f"Willow updates already inactive for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
             return
-        willow_status[chat_id] = False
+        await set_willow_status(chat_id, False)
         await message.reply(f"🚫 Willow updates stopped for {'this chat' if chat_id == message.chat.id else 'specified channel'}")
-        if chat_id in willow_messages:
-            for msg_id in willow_messages[chat_id]:
-                try:
-                    await client.delete_messages(chat_id, msg_id)
-                except:
-                    pass
-            willow_messages.pop(chat_id)
+        
+        # Delete old messages
+        old_msg_ids = await get_willow_messages(chat_id)
+        for msg_id in old_msg_ids:
+            try:
+                await client.delete_messages(chat_id, msg_id)
+            except:
+                pass
+        await delete_willow_messages(chat_id)
 
     else:
         await message.reply("Invalid command. Use:\n/willowtv on [channel_id]\n/willowtv off [channel_id]")
