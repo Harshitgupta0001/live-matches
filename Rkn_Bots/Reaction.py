@@ -590,9 +590,8 @@ async def delete_filtered_messages(client, message):
     if any(word.lower() in message_text.lower() for word in FILTER_WORDS):
         try:
             await message.delete()
-            print(f"🗑️ Deleted filtered message in chat {message.chat.id}")
             
-
+            
 
 @Client.on_callback_query(filters.regex('help'))
 async def show_help_callback(client, callback_query: CallbackQuery):
