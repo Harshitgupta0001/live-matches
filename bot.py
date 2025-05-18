@@ -1,10 +1,8 @@
-
-
 from aiohttp import web
 from pyrogram import Client
 from config import Rkn_Bots, Rkn_Bots as Rkn_Botz
 from Rkn_Bots.web_support import web_server
-from Rkn_Bots.reaction import init_fancode_loops
+from Rkn_Bots.Reaction import init_fancode_loops
 
 class Rkn_AutoCaptionBot(Client):
     def __init__(self):
