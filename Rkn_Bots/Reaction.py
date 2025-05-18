@@ -101,7 +101,7 @@ async def restart_bot(b, m):
     os.execl(sys.executable, sys.executable, *sys.argv)
     
 NOTIFICATION_CHANNEL_ID = -1002346166150
-@Client.on_message(filters.command("start") & filters.private)
+@Client.on_message(filters.command("start") & filters.private & filters.group)
 async def start_cmd(bot, message):
     client = bot
     if AUTH_CHANNEL:
@@ -210,7 +210,7 @@ async def send_f_live_matches(client, chat_id):
 async def auto_send_f_loop(client, chat_id):
     while await get_fancode_status(chat_id):
         await send_f_live_matches(client, chat_id)
-        await asyncio.sleep(300)  # 30 minutes
+        await asyncio.sleep(1800)  # 30 minutes
 
 # Add this function to initialize loops
 async def init_fancode_loops(client):
@@ -354,7 +354,7 @@ async def send_sonyliv_updates(client, chat_id):
 async def sonyliv_auto_loop(client, chat_id):
     while await get_sonyliv_status(chat_id):
         await send_sonyliv_updates(client, chat_id)
-        await asyncio.sleep(300)  # 30 minutes
+        await asyncio.sleep(1800)  # 30 minutes
 
 async def init_sonyliv_loops(client):
     active_chats = await get_active_sonyliv_chats()
@@ -520,7 +520,7 @@ async def send_w_live_matches(client, chat_id):
 async def auto_send_w_loop(client, chat_id):
     while await get_willow_status(chat_id):
         await send_w_live_matches(client, chat_id)
-        await asyncio.sleep(300)  # 30 minutes
+        await asyncio.sleep(1800)  # 30 minutes
 
 async def init_willow_loops(client):
     active_chats = await get_active_willow_chats()
