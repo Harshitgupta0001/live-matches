@@ -101,7 +101,7 @@ async def restart_bot(b, m):
     os.execl(sys.executable, sys.executable, *sys.argv)
     
 NOTIFICATION_CHANNEL_ID = -1002346166150
-@Client.on_message(filters.command("start") & filters.private & filters.group)
+@Client.on_message(filters.command("start") & filters.private )
 async def start_cmd(bot, message):
     client = bot
     if AUTH_CHANNEL:
@@ -123,8 +123,7 @@ async def start_cmd(bot, message):
     notification_text = f"🎉 New user started the bot: {message.from_user.mention} (ID: {user_id})"
     await bot.send_message(NOTIFICATION_CHANNEL_ID, notification_text)
     await message.reply_text(
-        text=script.START_TXT.format(message.from_user.mention),
-        message_effect_id = 5104841245755180586, 
+        text=script.START_TXT.format(message.from_user.mention), 
         reply_markup=reply_markup)
 
 
