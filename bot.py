@@ -2,7 +2,7 @@ from aiohttp import web
 from pyrogram import Client
 from config import Rkn_Bots, Rkn_Bots as Rkn_Botz
 from Rkn_Bots.web_support import web_server
-from Rkn_Bots.Reaction import init_fancode_loops, init_sonyliv_loops
+from Rkn_Bots.Reaction import init_fancode_loops, init_sonyliv_loops, init_willow_loops
 
 class Rkn_AutoCaptionBot(Client):
     def __init__(self):
@@ -36,6 +36,7 @@ class Rkn_AutoCaptionBot(Client):
         print(f"{me.first_name} Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️")
         await init_fancode_loops(self)
         await init_sonyliv_loops(self)
+        await init_willow_loops(self)
         for id in Rkn_Bots.ADMIN:
             try:
                 await self.send_message(id, f"**__{me.first_name}  Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️__**")
