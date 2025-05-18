@@ -123,7 +123,9 @@ async def start_cmd(bot, message):
     notification_text = f"🎉 New user started the bot: {message.from_user.mention} (ID: {user_id})"
     await bot.send_message(NOTIFICATION_CHANNEL_ID, notification_text)
     await message.reply_text(
-        text=script.START_TXT.format(message.from_user.mention), 
+        text=script.START_TXT.format(message.from_user.mention),
+        disable_web_page_preview = False, 
+        invert_media = True, 
         reply_markup=reply_markup)
 
 
