@@ -3,7 +3,7 @@ class script(object):
     <b>ɪ ᴀᴍ Live Sports Links Provider Bot 🔥</b>
     I Extract Sports Urls From Drm Platforms Like <b>Willow, Sonylive, Fancode</b>
     Click Help Button For More Information ✅
-<b><blockquote>Maintained By <a href='https://t.me/hgbotz'>𝙷𝙶𝙱𝙾𝚃ᶻ 🦋</a></blockquote></b>"""
+<b><blockquote>Maintained By <a href='https://t.me/Harshit_contact_bot'>HaRsHiT 🦋</a></blockquote></b>"""
 
     ABOUT_TXT = """<b><blockquote>⍟───[ MY ᴅᴇᴛᴀɪʟꜱ ]───⍟</blockquote>
 ‣ Maintenar: <a href='https://t.me/Harshit_contact_bot'>HaRsHiT 🦋</a> 
@@ -29,3 +29,9 @@ class script(object):
 <b>━━━━━━━✦✗✦━━━━━━━━━</b>
 /sliv on [chat_id] - <b>For Loop Sonyliv Auto Update Links In Any Channel</b>
 <b><blockquote>Maintained By 💝 - <a href='https://t.me/Harshit_contact_bot'>HaRsHiT 🦋</a></blockquote></b>"""
+
+    HOME_TXT = """𝗛𝗲𝗹𝗹𝗼  💞
+    <b>ɪ ᴀᴍ Live Sports Links Provider Bot 🔥</b>
+    I Extract Sports Urls From Drm Platforms Like <b>Willow, Sonylive, Fancode</b>
+    Click Help Button For More Information ✅
+<b><blockquote>Maintained By <a href='https://t.me/Harshit_contact_bot'>HaRsHiT 🦋</a></blockquote></b>"""
