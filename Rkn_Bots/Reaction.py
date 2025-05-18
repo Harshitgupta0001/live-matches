@@ -10,14 +10,12 @@ from Script import script
 import aiohttp
 
 buttons = [[
-        InlineKeyboardButton('✇ Uᴘᴅᴀᴛᴇs ✇', url="https://t.me/HGBOTZ"),
-        InlineKeyboardButton('✨ 𝙲𝙾𝙽𝚃𝙰𝙲𝚃 ✨', url="https://t.me/Harshit_contact_bot")
+        InlineKeyboardButton('✇ Movie Zone ✇', url="https://t.me/eera_Search_Zone"),
+        InlineKeyboardButton('✨ Crick Zone ✨', url="https://t.me/CricDynasty")
+    ],[
+        InlineKeyboardButton('❗️ʜᴇʟᴘ', callback_data='help'), 
+        InlineKeyboardButton('🦋 𝙰𝙱𝙾𝚄𝚃', callback_data='about')
     ]]
-
-group_buttons = [[InlineKeyboardButton('✇ Click To Start Me ✇', url="http://t.me/Reaction_99bot?start=True")
-               ],[
-                  InlineKeyboardButton('✇ Uᴘᴅᴀᴛᴇs ✇', url="https://t.me/HGBOTZ")
-                ]] 
 
 
 back_button = [[
@@ -28,7 +26,7 @@ back_button = [[
               ]]
 
 about_buttons = [[
-        InlineKeyboardButton('🙂 𝐎𝐖𝐍𝐄𝐑', url='https://t.me/Harshit_contact_bot')
+        InlineKeyboardButton('Maintainer 🙂‍↔️', url='https://t.me/Harshit_contact_bot')
         ],[
         InlineKeyboardButton('❗️ʜᴇʟᴘ', callback_data='help'), 
         InlineKeyboardButton('🦋 𝙷𝙾𝙼𝙴', callback_data='back')
@@ -36,6 +34,7 @@ about_buttons = [[
         InlineKeyboardButton('📜 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ', url='https://t.me/HGBOTZ_support'),
         InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ', url='https://telegram.me/hgbotz')
         ]]
+
 
 
 async def is_subscribed(bot, query, channel):
@@ -570,3 +569,20 @@ async def willow_tv_handler(client, message):
 
     else:
         await message.reply("Invalid command. Use:\n/willowtv on [channel_id]\n/willowtv off [channel_id]")
+
+
+
+@Client.on_callback_query(filters.regex('help'))
+async def show_help_callback(client, callback_query: CallbackQuery):
+    await callback_query.answer()  # Acknowledge the callback
+    await callback_query.message.edit_text(text=script.HELP_TXT, reply_markup=InlineKeyboardMarkup(back_button))
+
+@Client.on_callback_query(filters.regex('back'))
+async def back_callback(client, callback_query: CallbackQuery):
+    await callback_query.answer()  # Acknowledge the callback
+    await callback_query.message.edit_text(text=script.HOME_TXT, reply_markup=InlineKeyboardMarkup(buttons))
+
+@Client.on_callback_query(filters.regex('about'))
+async def about_callback(client, callback_query: CallbackQuery):
+    await callback_query.answer()# Acknowledge the callback
+    await callback_query.message.edit_text(text=script.ABOUT_TXT, reply_markup=InlineKeyboardMarkup(about_buttons))
