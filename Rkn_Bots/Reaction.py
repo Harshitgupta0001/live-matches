@@ -2,7 +2,7 @@ import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
-from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages
+from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages, get_active_fancode_chats
 from pyrogram.errors import *
 from pyrogram.types import *
 from utils import react_msg 
@@ -212,6 +212,13 @@ async def auto_send_f_loop(client, chat_id):
     while await get_fancode_status(chat_id):
         await send_f_live_matches(client, chat_id)
         await asyncio.sleep(300)  # 30 minutes
+
+# Add this function to initialize loops
+async def init_fancode_loops(client):
+    active_chats = await get_active_fancode_chats()
+    for chat_id in active_chats:
+        asyncio.create_task(auto_send_f_loop(client, chat_id))
+        print(f"Restarted Fancode loop for chat {chat_id}")
 
 @Client.on_message(filters.command("fan") & filters.user(Rkn_Bots.ADMIN))
 async def fancode(client, message):
