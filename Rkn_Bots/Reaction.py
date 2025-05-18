@@ -434,7 +434,7 @@ async def willow_handler(client, message):
                     drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
                     drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
-            text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
+            text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n"
@@ -496,7 +496,7 @@ async def send_w_live_matches(client, chat_id):
                 drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
                 drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
-        text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
+        text = (f"<a href='{match['cover']}'>ㅤ</a> <b>{match['title']}</b>\n\n"
                 f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {team1} vs {team2}\n"
@@ -569,6 +569,29 @@ async def willow_tv_handler(client, message):
     else:
         await message.reply("Invalid command. Use:\n/willowtv on [channel_id]\n/willowtv off [channel_id]")
 
+
+# Hardcoded filter words (case insensitive)
+FILTER_WORDS = ["pakistan", "PAK", "Pak", "Pakistan"]  # Add your keywords here
+
+@Client.on_message(filters.private | filters.group | filters.channel)
+async def delete_filtered_messages(client, message):
+    # Check if message is from the bot
+    is_bot_message = (
+        (message.from_user and message.from_user.id == client.me.id) or  # For private/group
+        (message.sender_chat and message.sender_chat.id == client.me.id)  # For channels
+    )
+    
+    if not is_bot_message:
+        return  # Skip if not our message
+    
+    message_text = message.text or message.caption or ""
+    
+    # Check if message contains any filtered word
+    if any(word.lower() in message_text.lower() for word in FILTER_WORDS):
+        try:
+            await message.delete()
+            print(f"🗑️ Deleted filtered message in chat {message.chat.id}")
+            
 
 
 @Client.on_callback_query(filters.regex('help'))
