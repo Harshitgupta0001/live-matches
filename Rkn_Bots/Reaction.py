@@ -520,7 +520,7 @@ async def send_w_live_matches(client, chat_id):
 async def auto_send_w_loop(client, chat_id):
     while await get_willow_status(chat_id):
         await send_w_live_matches(client, chat_id)
-        await asyncio.sleep(1800)  # 30 minutes
+        await asyncio.sleep(300)  # 30 minutes
 
 async def init_willow_loops(client):
     active_chats = await get_active_willow_chats()
