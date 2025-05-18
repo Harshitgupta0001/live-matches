@@ -576,14 +576,14 @@ async def willow_tv_handler(client, message):
 @Client.on_callback_query(filters.regex('help'))
 async def show_help_callback(client, callback_query: CallbackQuery):
     await callback_query.answer()  # Acknowledge the callback
-    await callback_query.message.edit_text(text=script.HELP_TXT, reply_markup=InlineKeyboardMarkup(back_button))
+    await callback_query.message.edit_text(text=script.HELP_TXT, disable_web_page_preview=False, invert_media=True, reply_markup=InlineKeyboardMarkup(back_button))
 
 @Client.on_callback_query(filters.regex('back'))
 async def back_callback(client, callback_query: CallbackQuery):
     await callback_query.answer()  # Acknowledge the callback
-    await callback_query.message.edit_text(text=script.HOME_TXT, reply_markup=InlineKeyboardMarkup(buttons))
+    await callback_query.message.edit_text(text=script.HOME_TXT, disable_web_page_preview=False, invert_media=True, reply_markup=InlineKeyboardMarkup(buttons))
 
 @Client.on_callback_query(filters.regex('about'))
 async def about_callback(client, callback_query: CallbackQuery):
     await callback_query.answer()# Acknowledge the callback
-    await callback_query.message.edit_text(text=script.ABOUT_TXT, reply_markup=InlineKeyboardMarkup(about_buttons))
+    await callback_query.message.edit_text(text=script.ABOUT_TXT, disable_web_page_preview=False, invert_media=True, reply_markup=InlineKeyboardMarkup(about_buttons))
