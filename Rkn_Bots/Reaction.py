@@ -2,7 +2,7 @@ import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
-from .database import total_user, getid, delete, addCap, updateCap, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages
+from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages
 from pyrogram.errors import *
 from pyrogram.types import *
 from utils import react_msg 
