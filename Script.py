@@ -1,5 +1,5 @@
 class script(object):
-    START_TXT = """𝗛𝗲𝗹𝗹𝗼 {} 💞
+    START_TXT = """<a href='https://files.catbox.moe/noif87.mp4'>ㅤ</a>𝗛𝗲𝗹𝗹𝗼 {} 💞
     <b>ɪ ᴀᴍ Live Sports Links Provider Bot 🔥</b>
     I Extract Sports Urls From Drm Platforms Like <b>Willow, Sonylive, Fancode</b>
     Click Help Button For More Information ✅
