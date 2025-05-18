@@ -2,7 +2,7 @@ import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
-from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages, get_active_fancode_chats
+from .database import total_user, getid, delete, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages, get_active_fancode_chats, get_sonyliv_status, set_sonyliv_status, get_sonyliv_messages, set_sonyliv_messages, delete_sonyliv_messages, get_active_sonyliv_chats
 from pyrogram.errors import *
 from pyrogram.types import *
 from utils import react_msg 
@@ -303,9 +303,9 @@ async def sliv(client, message):
         await message.reply(f"Fail to Fatch {e}")
         print(f"Sony LIV error: {e}")
 
+
+
 SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
-sonyliv_status = {}  # chat_id: True/False
-sonyliv_messages = {}  # chat_id: list of msg ids
 
 async def fetch_sonyliv_live():
     async with httpx.AsyncClient() as http:
@@ -315,14 +315,14 @@ async def fetch_sonyliv_live():
 
 async def send_sonyliv_updates(client, chat_id):
     live_events = await fetch_sonyliv_live()
+    old_msg_ids = await get_sonyliv_messages(chat_id)
     
     # Delete old messages
-    if chat_id in sonyliv_messages:
-        for msg_id in sonyliv_messages[chat_id]:
-            try:
-                await client.delete_messages(chat_id, msg_id)
-            except:
-                pass
+    for msg_id in old_msg_ids:
+        try:
+            await client.delete_messages(chat_id, msg_id)
+        except:
+            pass
 
     sent_msg_ids = []
     for event in live_events:
@@ -337,7 +337,7 @@ async def send_sonyliv_updates(client, chat_id):
                 f"📡 <b>Channel:</b> {event.get('TVchannel', 'Sony LIV')}\n"
                 f"🎬 <b>Genre:</b> {event.get('genre', 'Sports')}\n"
                 f"🖥 <b>Quality:</b> {event.get('MaxResolution', 'HD')}\n"
-                f"<blockquote expandable ><b>Stream Links:</b>\n" + "\n".join(servers) + "\n\n</blockquote>"
+                f"<blockquote expandable><b>Stream Links:</b>\n" + "\n".join(servers) + "\n\n</blockquote>"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player in android and Autho iptv in pc to play stream</b>")
 
         try:
@@ -350,17 +350,23 @@ async def send_sonyliv_updates(client, chat_id):
         except Exception as e:
             print(f"Sony LIV send error: {e}")
 
-    sonyliv_messages[chat_id] = sent_msg_ids
+    await set_sonyliv_messages(chat_id, sent_msg_ids)
 
 async def sonyliv_auto_loop(client, chat_id):
-    while sonyliv_status.get(chat_id, False):
+    while await get_sonyliv_status(chat_id):
         await send_sonyliv_updates(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
-@Client.on_message(filters.command("sliv")  & filters.user(Rkn_Bots.ADMIN))
+async def init_sonyliv_loops(client):
+    active_chats = await get_active_sonyliv_chats()
+    for chat_id in active_chats:
+        asyncio.create_task(sonyliv_auto_loop(client, chat_id))
+        print(f"♻️ Restarted Sony LIV updates for chat {chat_id}")
+
+@Client.on_message(filters.command("sliv") & filters.user(Rkn_Bots.ADMIN))
 async def sonyliv_handler(client, message):
     if len(message.command) < 2:
-        return await message.reply("Usage:\n/sonyliv on [channel_id]\n/sonyliv off [channel_id]")
+        return await message.reply("Usage:\n/sliv on [channel_id]\n/sliv off [channel_id]")
 
     arg = message.command[1].lower()
     
@@ -371,30 +377,33 @@ async def sonyliv_handler(client, message):
         chat_id = message.chat.id
 
     if arg == "on":
-        if sonyliv_status.get(chat_id, False):
+        current_status = await get_sonyliv_status(chat_id)
+        if current_status:
             await message.reply(f"Sony LIV updates already active for {'this chat' if chat_id == message.chat.id else 'channel'}")
             return
-        sonyliv_status[chat_id] = True
+        await set_sonyliv_status(chat_id, True)
         await message.reply(f"🎬 Sony LIV LIVE updates activated for {'this chat' if chat_id == message.chat.id else 'channel'}!\nUpdates every 30 minutes")
         asyncio.create_task(sonyliv_auto_loop(client, chat_id))
 
     elif arg == "off":
-        if not sonyliv_status.get(chat_id, False):
+        current_status = await get_sonyliv_status(chat_id)
+        if not current_status:
             await message.reply(f"Sony LIV updates already inactive for {'this chat' if chat_id == message.chat.id else 'channel'}")
             return
-        sonyliv_status[chat_id] = False
+        await set_sonyliv_status(chat_id, False)
         await message.reply(f"⏹ Sony LIV updates stopped for {'this chat' if chat_id == message.chat.id else 'channel'}")
-        if chat_id in sonyliv_messages:
-            for msg_id in sonyliv_messages[chat_id]:
-                try:
-                    await client.delete_messages(chat_id, msg_id)
-                except:
-                    pass
-            sonyliv_messages.pop(chat_id)
+        
+        # Delete old messages
+        old_msg_ids = await get_sonyliv_messages(chat_id)
+        for msg_id in old_msg_ids:
+            try:
+                await client.delete_messages(chat_id, msg_id)
+            except:
+                pass
+        await delete_sonyliv_messages(chat_id)
 
     else:
         await message.reply("Invalid command. Use:\n/sliv on [channel_id]\n/sliv off [channel_id]")
-
 
 
 WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
