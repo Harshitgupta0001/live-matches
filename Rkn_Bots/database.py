@@ -7,6 +7,7 @@ chnl_ids = db.chnl_ids
 users = db.users
 fancode_data = db.fancode_data  # New collection for fancode status and messages
 sonyliv_data = db.sonyliv_data
+willow_data = db.willow_data
 # Insert user data
 async def insert(user_id):
     user_det = {"_id": user_id}
@@ -99,6 +100,43 @@ async def delete_sonyliv_messages(chat_id):
 async def get_active_sonyliv_chats():
     active_chats = []
     async for doc in sonyliv_data.find({"status": True}):  # Direct async iteration
+        active_chats.append(doc["_id"])
+    return active_chats
+
+
+async def get_willow_status(chat_id):
+    data = await willow_data.find_one({"_id": chat_id})
+    return data.get("status", False) if data else False
+
+async def set_willow_status(chat_id, status):
+    await willow_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"status": status}},
+        upsert=True
+    )
+
+async def get_willow_messages(chat_id):
+    data = await willow_data.find_one({"_id": chat_id})
+    return data.get("messages", []) if data else []
+
+async def set_willow_messages(chat_id, messages):
+    await willow_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"messages": messages}},
+        upsert=True
+    )
+
+async def delete_willow_messages(chat_id):
+    await willow_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"messages": []}},
+        upsert=True
+    )
+
+# Add this to Database.py
+async def get_active_willow_chats():
+    active_chats = []
+    async for doc in willow_data.find({"status": True}):  # Direct async iteration
         active_chats.append(doc["_id"])
     return active_chats
 
