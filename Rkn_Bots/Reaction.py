@@ -2,7 +2,7 @@ import requests, httpx
 from pyrogram import Client, filters, errors, types
 from config import Rkn_Bots, AUTH_CHANNEL
 import asyncio, re, time, sys, random
-from .database import total_user, getid, delete, addCap, updateCap, insert, chnl_ids
+from .database import total_user, getid, delete, addCap, updateCap, insert, chnl_ids, get_fancode_status, set_fancode_status, get_fancode_messages, set_fancode_messages, delete_fancode_messages
 from pyrogram.errors import *
 from pyrogram.types import *
 from utils import react_msg 
@@ -166,10 +166,8 @@ async def fancode_handler(client, message):
 
 
 
-FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
 
-fancode_status = {}  # chat_id: True/False
-fancode_messages = {}  # chat_id: list of msg ids
+FANCODE_URL = "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
 
 async def fetch_f_live_matches():
     async with httpx.AsyncClient() as http:
@@ -179,13 +177,14 @@ async def fetch_f_live_matches():
 
 async def send_f_live_matches(client, chat_id):
     live_matches = await fetch_f_live_matches()
-    if chat_id in fancode_messages:
-        # delete old messages
-        for msg_id in fancode_messages[chat_id]:
-            try:
-                await client.delete_messages(chat_id, msg_id)
-            except:
-                pass
+    old_msg_ids = await get_fancode_messages(chat_id)
+    
+    # delete old messages
+    for msg_id in old_msg_ids:
+        try:
+            await client.delete_messages(chat_id, msg_id)
+        except:
+            pass
 
     sent_msg_ids = []
     for match in live_matches:
@@ -207,10 +206,10 @@ async def send_f_live_matches(client, chat_id):
         except Exception as e:
             print(f"Error sending message: {e}")
 
-    fancode_messages[chat_id] = sent_msg_ids
+    await set_fancode_messages(chat_id, sent_msg_ids)
 
 async def auto_send_f_loop(client, chat_id):
-    while fancode_status.get(chat_id, False):
+    while await get_fancode_status(chat_id):
         await send_f_live_matches(client, chat_id)
         await asyncio.sleep(1800)  # 30 minutes
 
@@ -228,31 +227,32 @@ async def fancode(client, message):
         chat_id = message.chat.id
 
     if arg == "on":
-        if fancode_status.get(chat_id, False):
+        current_status = await get_fancode_status(chat_id)
+        if current_status:
             await message.reply(f"Fancode auto updates are already ON for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
             return
-        fancode_status[chat_id] = True
+        await set_fancode_status(chat_id, True)
         await message.reply(f"Fancode auto updates started for {'this chat' if chat_id == message.chat.id else 'the specified channel'}. Updates every 30 minutes.")
         asyncio.create_task(auto_send_f_loop(client, chat_id))
 
     elif arg == "off":
-        if not fancode_status.get(chat_id, False):
+        current_status = await get_fancode_status(chat_id)
+        if not current_status:
             await message.reply(f"Fancode auto updates are already OFF for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
             return
-        fancode_status[chat_id] = False
+        await set_fancode_status(chat_id, False)
         await message.reply(f"Fancode auto updates stopped for {'this chat' if chat_id == message.chat.id else 'the specified channel'}.")
         # delete old messages
-        if chat_id in fancode_messages:
-            for msg_id in fancode_messages[chat_id]:
-                try:
-                    await client.delete_messages(chat_id, msg_id)
-                except:
-                    pass
-            fancode_messages.pop(chat_id)
+        old_msg_ids = await get_fancode_messages(chat_id)
+        for msg_id in old_msg_ids:
+            try:
+                await client.delete_messages(chat_id, msg_id)
+            except:
+                pass
+        await delete_fancode_messages(chat_id)
 
     else:
         await message.reply("Unknown option. Use:\n/fan on [channel_id]\n/fan off [channel_id]")
-
 
 
 
