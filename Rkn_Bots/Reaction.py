@@ -434,7 +434,7 @@ async def willow_handler(client, message):
                     drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
                     drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
-            text = (f"<a href='{match['cover']}'>ㅤ</a>\n<b>{match['title']}</b>\n\n"
+            text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n"
@@ -496,7 +496,7 @@ async def send_w_live_matches(client, chat_id):
                 drm_url = f"{url['url']}?|drmScheme=clearkey&drmLicense={key}"
                 drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
-        text = (f"<a href='{match['cover']}'>ㅤ</a>\n<b>{match['title']}</b>\n\n"
+        text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
                 f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {team1} vs {team2}\n"
@@ -568,7 +568,6 @@ async def willow_tv_handler(client, message):
 
     else:
         await message.reply("Invalid command. Use:\n/willowtv on [channel_id]\n/willowtv off [channel_id]")
-
 
 # Hardcoded filter words (case insensitive)
 FILTER_WORDS = ["pakistan", "PAK", "Pak", "Pakistan"]  # Add your keywords here
