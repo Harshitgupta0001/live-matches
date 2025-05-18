@@ -19,8 +19,8 @@ buttons = [[
 
 
 back_button = [[
-                 InlineKeyboardButton('sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ', url='https://t.me/HGBOTZ_support'),
-                 InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ', url='https://telegram.me/hgbotz')
+                 InlineKeyboardButton('MOVIE ɢʀᴏᴜᴘ', url='https://t.me/Eera_Search_Zone'),
+                 InlineKeyboardButton('crick ᴄʜᴀɴɴᴇʟ', url='https://telegram.me/CricDynasty')
               ],[
                  InlineKeyboardButton('🔙 back', callback_data='back')
               ]]
@@ -31,8 +31,8 @@ about_buttons = [[
         InlineKeyboardButton('❗️ʜᴇʟᴘ', callback_data='help'), 
         InlineKeyboardButton('🦋 𝙷𝙾𝙼𝙴', callback_data='back')
         ],[
-        InlineKeyboardButton('📜 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ', url='https://t.me/HGBOTZ_support'),
-        InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ', url='https://telegram.me/hgbotz')
+        InlineKeyboardButton('❗️ Movie ɢʀᴏᴜᴘ', url='https://t.me/eera_Search_Zone'),
+        InlineKeyboardButton('❗️ crick ᴄʜᴀɴɴᴇʟ', url='https://telegram.me/CricDynasty')
         ]]
 
 
