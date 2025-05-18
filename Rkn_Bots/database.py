@@ -56,3 +56,11 @@ async def delete_fancode_messages(chat_id):
         {"$set": {"messages": []}},
         upsert=True
     )
+
+# Add this to Database.py
+async def get_active_fancode_chats():
+    cursor = fancode_data.find({"status": True})
+    active_chats = []
+    async for doc in await cursor.to_list(length=None):
+        active_chats.append(doc["_id"])
+    return active_chats
