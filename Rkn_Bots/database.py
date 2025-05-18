@@ -1,9 +1,3 @@
-# (c) @RknDeveloperr
-# Rkn Developer 
-# Don't Remove Credit 😔
-# Telegram Channel @RknDeveloper & @Rkn_Bots
-# Developer @RknDeveloperr
-
 import motor.motor_asyncio
 from config import Rkn_Bots
 
@@ -11,8 +5,9 @@ client = motor.motor_asyncio.AsyncIOMotorClient(Rkn_Bots.DB_URL)
 db = client[Rkn_Bots.DB_NAME]
 chnl_ids = db.chnl_ids
 users = db.users
+fancode_data = db.fancode_data  # New collection for fancode status and messages
 
-#insert user data
+# Insert user data
 async def insert(user_id):
     user_det = {"_id": user_id}
     try:
@@ -31,15 +26,33 @@ async def getid():
 
 async def delete(id):
     await users.delete_one(id)
-                     
-async def addCap(chnl_id, caption):
-    dets = {"chnl_id": chnl_id, "caption": caption}
-    await chnl_ids.insert_one(dets)
 
-async def updateCap(chnl_id, caption):
-    await chnl_ids.update_one({"chnl_id": chnl_id}, {"$set": {"caption": caption}})
+# Fancode functions
+async def get_fancode_status(chat_id):
+    data = await fancode_data.find_one({"_id": chat_id})
+    return data.get("status", False) if data else False
 
-# Rkn Developer 
-# Don't Remove Credit 😔
-# Telegram Channel @RknDeveloper & @Rkn_Bots
-# Developer @RknDeveloperr
+async def set_fancode_status(chat_id, status):
+    await fancode_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"status": status}},
+        upsert=True
+    )
+
+async def get_fancode_messages(chat_id):
+    data = await fancode_data.find_one({"_id": chat_id})
+    return data.get("messages", []) if data else []
+
+async def set_fancode_messages(chat_id, messages):
+    await fancode_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"messages": messages}},
+        upsert=True
+    )
+
+async def delete_fancode_messages(chat_id):
+    await fancode_data.update_one(
+        {"_id": chat_id},
+        {"$set": {"messages": []}},
+        upsert=True
+    )
