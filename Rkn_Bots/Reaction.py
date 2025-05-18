@@ -355,7 +355,7 @@ async def send_sonyliv_updates(client, chat_id):
 async def sonyliv_auto_loop(client, chat_id):
     while await get_sonyliv_status(chat_id):
         await send_sonyliv_updates(client, chat_id)
-        await asyncio.sleep(1800)  # 30 minutes
+        await asyncio.sleep(300)  # 30 minutes
 
 async def init_sonyliv_loops(client):
     active_chats = await get_active_sonyliv_chats()
