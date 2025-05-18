@@ -34,7 +34,7 @@ class Rkn_AutoCaptionBot(Client):
         bind_address = "0.0.0.0"
         await web.TCPSite(app, bind_address, Rkn_Bots.PORT).start()
         print(f"{me.first_name} Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️")
-        await init_fancode_loops(client) 
+        await init_fancode_loops(self) 
         for id in Rkn_Bots.ADMIN:
             try:
                 await self.send_message(id, f"**__{me.first_name}  Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️__**")
