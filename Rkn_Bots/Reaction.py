@@ -211,7 +211,7 @@ async def send_f_live_matches(client, chat_id):
 async def auto_send_f_loop(client, chat_id):
     while await get_fancode_status(chat_id):
         await send_f_live_matches(client, chat_id)
-        await asyncio.sleep(1800)  # 30 minutes
+        await asyncio.sleep(300)  # 30 minutes
 
 @Client.on_message(filters.command("fan") & filters.user(Rkn_Bots.ADMIN))
 async def fancode(client, message):
