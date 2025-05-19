@@ -406,7 +406,7 @@ async def sonyliv_handler(client, message):
         await message.reply("Invalid command. Use:\n/sliv on [channel_id]\n/sliv off [channel_id]")
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
+WILLOW_URL = "https://raw.githubusercontent.com/drmlive/willow-live-events/main/willow.json"
 
 @Client.on_message(filters.command("willow") & filters.private)
 async def willow_handler(client, message):
@@ -463,7 +463,7 @@ async def willow_handler(client, message):
 
 
 
-WILLOW_URL = "https://hgbotz.serv00.net/willow.php"
+WILLOW_URL = "https://raw.githubusercontent.com/drmlive/willow-live-events/main/willow.json"
 
 async def fetch_w_live_matches():
     async with httpx.AsyncClient() as http:
