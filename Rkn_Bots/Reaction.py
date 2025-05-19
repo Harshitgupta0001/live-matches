@@ -264,7 +264,7 @@ async def fancode(client, message):
 
 
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
+SONYLIV_URL = "https://terapi-git-main-hgbotz-s-projects.vercel.app"
 
 @Client.on_message(filters.command("sonyliv") & filters.private)
 async def sliv(client, message):
@@ -305,7 +305,7 @@ async def sliv(client, message):
 
 
 
-SONYLIV_URL = "https://hgbotz.serv00.net/sliv.php"
+SONYLIV_URL = "https://terapi-git-main-hgbotz-s-projects.vercel.app"
 
 async def fetch_sonyliv_live():
     async with httpx.AsyncClient() as http:
