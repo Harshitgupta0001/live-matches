@@ -189,11 +189,11 @@ async def send_f_live_matches(client, chat_id):
     sent_msg_ids = []
     for match in live_matches:
         text = (f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
-                f"🔴 <b>FROM:</b> Fancode\n"
+                f"🔴 <blockquote expandable <b>Provider: Fancode </b>\n"
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
-                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}</blockquote>\n"
+                f"<blockquote expandable <b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
         try:
@@ -287,6 +287,7 @@ async def sliv(client, message):
                     servers.append(f"🔗 {key}: {match[key]}")
 
             text = (f"<b>📺 {match['event']}</b>\n\n"
+                    f"<b>Provider: SONY LIV 🔴</b>\n"
                     f"🏆 <b>Match:</b> {match['match']}\n"
                     f"📡 <b>Channel:</b> {match.get('TVchannel', 'N/A')}\n"
                     f"🎬 <b>Genre:</b> {match.get('genre', 'Sports')}\n"
@@ -333,6 +334,7 @@ async def send_sonyliv_updates(client, chat_id):
                 servers.append(f"🌐 {key}: {event[key]}")
         
         text = (f"<b>🔴 LIVE: {event['event']}</b>\n\n"
+                f"<b>Provider: SONY LIV🔴</b>\n"
                 f"🏆 <b>Match:</b> {event['match']}\n"
                 f"📡 <b>Channel:</b> {event.get('TVchannel', 'Sony LIV')}\n"
                 f"🎬 <b>Genre:</b> {event.get('genre', 'Sports')}\n"
@@ -437,6 +439,7 @@ async def willow_handler(client, message):
                     drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
             text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
+                    f"<b>Provider: Willow Tv 🔴</b>\n"
                     f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                     f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                     f"👥 <b>Teams:</b> {team1} vs {team2}\n"
@@ -499,6 +502,7 @@ async def send_w_live_matches(client, chat_id):
                 drm_streams.append(f"🌐 {url['cdn']}: <code>{drm_url}</code>")
 
         text = (f"<a href='{match['cover']}'>ㅤ</a><b>{match['title']}</b>\n\n"
+                f"<b>Provider: Willow Tv 🔴</b>\n"
                 f"🏆 <b>Event Type:</b> {match.get('contentType', 'Cricket Match')}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {team1} vs {team2}\n"
