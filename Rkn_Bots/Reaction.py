@@ -189,7 +189,7 @@ async def send_f_live_matches(client, chat_id):
     sent_msg_ids = []
     for match in live_matches:
         text = (f"<b>{match['match_name']} ({match['event_name']})</b>\n\n"
-                f"🔴 <blockquote expandable <b>Provider: Fancode </b>\n"
+                f" <blockquote expandable <b>🔴 Provider: Fancode </b>\n"
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
                 f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}</blockquote>\n"
