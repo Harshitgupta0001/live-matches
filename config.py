@@ -1,8 +1,4 @@
-# (c) @RknDeveloperr
-# Rkn Developer 
-# Don't Remove Credit 😔
-# Telegram Channel @RknDeveloper & @Rkn_Botz
-# Developer @RknDeveloperr
+
 
 import re, time, os
 from os import environ
@@ -18,7 +14,7 @@ class Rkn_Bots(object):
     # Rkn client config  ( required.. 😥)
     API_ID = os.environ.get("API_ID", "25492855")
     API_HASH = os.environ.get("API_HASH", "61876db014de51a4ace6b169608be4f1")
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", "7376012055:AAGH9MZiFDWVArfToOEADKYQJJ-8SYv1jcg")
+    BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 
     # start_pic
     RKN_PIC = os.environ.get("RKN_PIC", "https://i.ibb.co/xS50RVKK/photo-2025-04-24-12-50-14-7505088804366057488.jpg")
@@ -31,7 +27,7 @@ class Rkn_Bots(object):
     FORCE_SUB = os.environ.get("FORCE_SUB", "") 
     
     # database config ( required.. 😥)
-    DB_NAME = os.environ.get("DB_NAME", "crickeera")     
+    DB_NAME = os.environ.get("DB_NAME", "StreamSpikeBot")     
     DB_URL = os.environ.get("DB_URL", "mongodb+srv://Yash_607:Yash_607@cluster0.r3s9sbo.mongodb.net/?retryWrites=true&w=majority")
 
     # default caption 
