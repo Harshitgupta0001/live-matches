@@ -189,11 +189,11 @@ async def send_f_live_matches(client, chat_id):
     sent_msg_ids = []
     for match in live_matches:
         text = (f"<b>{match['match_name']} ({match['event_name']})</b>\n"
-                f"<b>🔴 Provider: Fancode </b>\n"
+                f"🔴 <b>Provider:</b> Fancode\n"
                 f"🏟 <b>Event:</b> {match['event_name']}\n"
                 f"🕒 <b>Start Time:</b> {match['startTime']}\n"
-                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}</b>\n"
-                f"<blockquote expandable <b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
+                f"👥 <b>Teams:</b> {match['team_1']} vs {match['team_2']}\n"
+                f"<blockquote><b>Stream info </b>\n🌐 <b>Normal Stream:</b> {match['dai_url']}\n🚫 <b>Ad-Free Stream:</b> {match['adfree_url']}</blockquote>\n"
                 f"<b>Note: Copy and paste the url in NS player or VLC media player to play stream</b>"
             )
         try:
